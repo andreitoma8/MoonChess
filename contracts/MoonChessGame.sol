@@ -3,11 +3,11 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
+import "../interfaces/IMoonChessToken.sol";
 
 contract MoonChessGame is ERC1155Holder, Ownable {
-    IERC20 public token;
+    IMoonChessToken public token;
     IERC1155 public collection;
 
     bool private paused = true;
@@ -23,12 +23,12 @@ contract MoonChessGame is ERC1155Holder, Ownable {
 
     // Set the address of the Token and the Collection
     constructor(address _token, address _collection) {
-        token = IERC20(_token);
+        token = IMoonChessToken(_token);
         collection = IERC1155(_collection);
     }
 
     // Function users call to deposit tokens into the game
-    function depositToken(uint256 _amount) public {
+    function depositToken(uint256 _amount) public pausable {
         token.transferFrom(msg.sender, address(this), _amount);
         emit TokenDeposit(msg.sender, _amount);
     }
@@ -36,6 +36,7 @@ contract MoonChessGame is ERC1155Holder, Ownable {
     // Function users call to deposit collectables into the game
     function depositCollection(uint256[] memory _ids, uint256[] memory _amount)
         public
+        pausable
     {
         collection.safeBatchTransferFrom(
             msg.sender,
@@ -45,6 +46,15 @@ contract MoonChessGame is ERC1155Holder, Ownable {
             ""
         );
         emit CollectionDeposit(msg.sender, _ids, _amount);
+    }
+
+    function sendTokens(
+        address _user,
+        uint256 _withdrawAmount,
+        uint256 _burnAmount
+    ) public onlyOwner {
+        token.transfer(_user, _withdrawAmount);
+        token.burn(_burnAmount);
     }
 
     // Utils
