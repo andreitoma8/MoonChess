@@ -20,8 +20,8 @@ contract MoonChessCollection is
     string private uriPrefix;
     string private uriSuffix = ".json";
 
-    uint256 public price = 0.01 ether;
-    uint256 public maxSupply = 1000000000;
+    uint256 public price = 5 ether;
+    uint256 public maxSupply = 1000000;
 
     bool private paused = true;
 
@@ -30,41 +30,73 @@ contract MoonChessCollection is
         symbol = "CHESS";
     }
 
+    // Mint modifier
     modifier mintCompliance(uint256 id, uint256 amount) {
+        require(!paused, "Minting is paused");
         require(
             amount < 10,
             "You can not mint more than 10 NFTs per transaction"
         );
-        require(totalSupply(id) < maxSupply, "Max supply reached");
-        require(!paused, "Minting is paused");
+        require(totalSupply(id) + amount <= maxSupply, "Max supply reached");
+        require(
+            msg.value >= price * amount,
+            "Value of the transaction is too low"
+        );
         _;
     }
 
+    // Batch mint modifier
+    modifier mintBatchCompliance(
+        uint256[] memory ids,
+        uint256[] memory amounts
+    ) {
+        require(!paused, "Minting is paused");
+        uint256 s;
+        for (uint256 i = 0; i < ids.length; i++) {
+            require(
+                totalSupply(ids[i]) + amounts[i] <= maxSupply,
+                "Total supply reached."
+            );
+            s += amounts[i];
+        }
+        require(msg.value >= s * price, "Value of the transaction is too low");
+        _;
+    }
+
+    // Mint function where people buy
     function mint(uint256 id, uint256 amount)
         public
         payable
         mintCompliance(id, amount)
     {
-        require(
-            msg.value >= price * amount,
-            "Value of the transaction is too low"
-        );
         _mint(msg.sender, id, amount, "");
     }
 
+    // Mint function in bulk where people can buy more than one type of cards
     function mintBatch(
         address to,
         uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    ) public onlyOwner {
-        _mintBatch(to, ids, amounts, data);
+        uint256[] memory amounts
+    ) public payable mintBatchCompliance(ids, amounts) {
+        _mintBatch(to, ids, amounts, "");
     }
 
+    // Set the URI for metadata
     function setUriPrefix(string memory newUriPrefix) public onlyOwner {
         uriPrefix = newUriPrefix;
     }
 
+    // Set if minting is paused or not
+    function setPaused(bool _paused) public onlyOwner {
+        paused = _paused;
+    }
+
+    // Set the price
+    function setPrice(uint256 _price) public onlyOwner {
+        price = _price;
+    }
+
+    // Function that returns the URI for the token ID
     function uri(uint256 _tokenId)
         public
         view
@@ -84,6 +116,12 @@ contract MoonChessCollection is
                 : "";
     }
 
+    // Withdraw ETH function
+    function withdraw() public onlyOwner {
+        (bool os, ) = payable(owner()).call{value: address(this).balance}("");
+        require(os);
+    }
+
     // The following functions are overrides required by Solidity.
 
     function _beforeTokenTransfer(
@@ -96,4 +134,6 @@ contract MoonChessCollection is
     ) internal override(ERC1155, ERC1155Supply) {
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
+
+    receive() external payable {}
 }
