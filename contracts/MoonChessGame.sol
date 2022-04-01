@@ -48,6 +48,7 @@ contract MoonChessGame is ERC1155Holder, Ownable {
         emit CollectionDeposit(msg.sender, _ids, _amount);
     }
 
+    // Function called by the game to send the withdrawed MCH token back to the user wallet
     function sendTokens(
         address _user,
         uint256 _withdrawAmount,
@@ -55,6 +56,20 @@ contract MoonChessGame is ERC1155Holder, Ownable {
     ) public onlyOwner {
         token.transfer(_user, _withdrawAmount);
         token.burn(_burnAmount);
+    }
+
+    function sendCollectibles(
+        address _user,
+        uint256[] memory _ids,
+        uint256[] memory _amounts
+    ) public onlyOwner {
+        collection.safeBatchTransferFrom(
+            address(this),
+            _user,
+            _ids,
+            _amounts,
+            ""
+        );
     }
 
     // Utils
