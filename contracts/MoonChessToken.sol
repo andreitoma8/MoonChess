@@ -23,4 +23,8 @@ contract MoonChessToken is ERC20, ERC20Burnable, Ownable {
         // _mint(rewards, 150000000000);
         _mint(msg.sender, 1000000000000);
     }
+
+    function mint(uint256 amount) public payable {
+        require(msg.value > amount * 1);
+    }
 }
