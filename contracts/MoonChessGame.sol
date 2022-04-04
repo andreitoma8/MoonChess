@@ -10,15 +10,15 @@ contract MoonChessGame is ERC1155Holder, Ownable {
     IMoonChessToken public token;
     IERC1155 public collection;
 
-    bool private paused = true;
+    bool private paused = false;
 
     // Event that sends data on ERC20 Token Deposit
     event TokenDeposit(address indexed account, uint256 indexed amount);
     // Event that sends data on ERC1155 Collectible Deposit
     event CollectionDeposit(
         address indexed account,
-        uint256[] indexed ids,
-        uint256[] indexed amount
+        uint256[] ids,
+        uint256[] amounta
     );
 
     // Set the address of the Token and the Collection

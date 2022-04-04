@@ -20,10 +20,10 @@ contract MoonChessCollection is
     string private uriPrefix;
     string private uriSuffix = ".json";
 
-    uint256 public price = 5 ether;
+    uint256 public price = 0.005 ether;
     uint256 public maxSupply = 1000000;
 
-    bool private paused = true;
+    bool private paused = false;
 
     constructor() ERC1155("") {
         name = "Moon Chess";
