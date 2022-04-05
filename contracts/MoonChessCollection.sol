@@ -34,7 +34,7 @@ contract MoonChessCollection is
     modifier mintCompliance(uint256 id, uint256 amount) {
         require(!paused, "Minting is paused");
         require(
-            amount < 10,
+            amount <= 10,
             "You can not mint more than 10 NFTs per transaction"
         );
         require(totalSupply(id) + amount <= maxSupply, "Max supply reached");
@@ -56,6 +56,10 @@ contract MoonChessCollection is
             require(
                 totalSupply(ids[i]) + amounts[i] <= maxSupply,
                 "Total supply reached."
+            );
+            require(
+                amounts[i] <= 10,
+                "You can not mint more than 10 NFTs per transaction"
             );
             s += amounts[i];
         }
