@@ -3,14 +3,14 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
+import "../interfaces/IMoonChessCollection.sol";
 import "../interfaces/IMoonChessToken.sol";
 
 contract MoonChessGame is ERC1155Holder, Ownable {
     IMoonChessToken public token;
-    IERC1155 public collection;
+    IMoonChessCollection public collection;
 
-    bool private paused = false;
+    bool private paused = true;
 
     // Event that sends data on ERC20 Token Deposit
     event TokenDeposit(address indexed account, uint256 indexed amount);
@@ -18,13 +18,13 @@ contract MoonChessGame is ERC1155Holder, Ownable {
     event CollectionDeposit(
         address indexed account,
         uint256[] ids,
-        uint256[] amounta
+        uint256[] amount
     );
 
     // Set the address of the Token and the Collection
     constructor(address _token, address _collection) {
         token = IMoonChessToken(_token);
-        collection = IERC1155(_collection);
+        collection = IMoonChessCollection(_collection);
     }
 
     // Function users call to deposit tokens into the game
@@ -62,7 +62,9 @@ contract MoonChessGame is ERC1155Holder, Ownable {
     function sendCollectibles(
         address _user,
         uint256[] memory _ids,
-        uint256[] memory _amounts
+        uint256[] memory _amounts,
+        uint256[] memory _burnIds,
+        uint256[] memory _burnAmount
     ) public onlyOwner {
         collection.safeBatchTransferFrom(
             address(this),
@@ -71,6 +73,7 @@ contract MoonChessGame is ERC1155Holder, Ownable {
             _amounts,
             ""
         );
+        collection.burnBatch(address(this), _burnIds, _burnAmount);
     }
 
     // Utils
