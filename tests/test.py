@@ -7,10 +7,13 @@ def test_main():
     # Set up accounts
     owner = accounts[0]
     user = accounts[1]
+    gameWallet = accounts[9]
     # Set up smart contracts
     token = MoonChessToken.deploy({"from": owner})
     collection = MoonChessCollection.deploy(token.address, {"from": owner})
-    game = MoonChessGame.deploy(token.address, collection.address, {"from": owner})
+    game = MoonChessGame.deploy(
+        token.address, collection.address, gameWallet.address, {"from": owner}
+    )
     # Mint ERC20 and approve
     token.mint(100, {"from": user})
     token.approve(collection.address, 100 * DECIMALS, {"from": user})
