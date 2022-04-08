@@ -23,7 +23,7 @@ contract MoonChessCollection is
     string private uriPrefix;
     string private uriSuffix = ".json";
 
-    uint256 public price = 0.005 ether;
+    uint256 public price = 5 ether;
     uint256 public maxSupply = 1000000;
 
     bool private paused = false;
@@ -122,9 +122,8 @@ contract MoonChessCollection is
     }
 
     // Withdraw ETH function
-    function withdraw() public onlyOwner {
-        (bool os, ) = payable(owner()).call{value: address(this).balance}("");
-        require(os);
+    function withdraw(uint256 _amount) public onlyOwner {
+        token.transfer(owner(), _amount);
     }
 
     // The following functions are overrides required by Solidity.
