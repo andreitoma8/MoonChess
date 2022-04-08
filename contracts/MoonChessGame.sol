@@ -12,6 +12,8 @@ contract MoonChessGame is ERC1155Holder, Ownable {
 
     bool private paused = true;
 
+    address private gameAddress;
+
     // Event that sends data on ERC20 Token Deposit
     event TokenDeposit(address indexed account, uint256 indexed amount);
     // Event that sends data on ERC1155 Collectible Deposit
@@ -22,9 +24,20 @@ contract MoonChessGame is ERC1155Holder, Ownable {
     );
 
     // Set the address of the Token and the Collection
-    constructor(address _token, address _collection) {
+    constructor(
+        address _token,
+        address _collection,
+        address _gameAddress
+    ) {
         token = IMoonChessToken(_token);
         collection = IMoonChessCollection(_collection);
+        gameAddress = _gameAddress;
+    }
+
+    // Modifier for game to make payments
+    modifier onlyGame() {
+        require(msg.sender == gameAddress);
+        _;
     }
 
     // Function users call to deposit tokens into the game
@@ -53,7 +66,7 @@ contract MoonChessGame is ERC1155Holder, Ownable {
         address _user,
         uint256 _withdrawAmount,
         uint256 _burnAmount
-    ) public {
+    ) public onlyGame {
         token.transfer(_user, _withdrawAmount);
         token.burn(_burnAmount);
     }
@@ -65,7 +78,7 @@ contract MoonChessGame is ERC1155Holder, Ownable {
         uint256[] memory _amounts,
         uint256[] memory _burnIds,
         uint256[] memory _burnAmount
-    ) public {
+    ) public onlyGame {
         collection.safeBatchTransferFrom(
             address(this),
             _user,
@@ -86,5 +99,9 @@ contract MoonChessGame is ERC1155Holder, Ownable {
     // Failsafe function to pause deposits
     function setPaused(bool _paused) public onlyOwner {
         paused = _paused;
+    }
+
+    function setGameAddress(address _newGameAddress) public onlyOwner {
+        gameAddress = _newGameAddress;
     }
 }
