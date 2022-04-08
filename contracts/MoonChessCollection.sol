@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "../interfaces/IMoonChessToken.sol";
 
 contract MoonChessCollection is
     ERC1155,
@@ -14,6 +15,8 @@ contract MoonChessCollection is
     ERC1155Supply
 {
     using Strings for uint256;
+
+    IMoonChessToken token;
 
     string public name;
     string public symbol;
@@ -25,9 +28,10 @@ contract MoonChessCollection is
 
     bool private paused = false;
 
-    constructor() ERC1155("") {
+    constructor(address _token) ERC1155("") {
         name = "Moon Chess";
         symbol = "CHESS";
+        token = IMoonChessToken(_token);
     }
 
     // Mint modifier
@@ -38,10 +42,7 @@ contract MoonChessCollection is
             "You can not mint more than 10 NFTs per transaction"
         );
         require(totalSupply(id) + amount <= maxSupply, "Max supply reached");
-        require(
-            msg.value >= price * amount,
-            "Value of the transaction is too low"
-        );
+        token.transferFrom(msg.sender, address(this), price * amount);
         _;
     }
 
@@ -63,7 +64,7 @@ contract MoonChessCollection is
             );
             s += amounts[i];
         }
-        require(msg.value >= s * price, "Value of the transaction is too low");
+        token.transferFrom(msg.sender, address(this), price * s);
         _;
     }
 
