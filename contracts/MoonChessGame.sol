@@ -66,7 +66,7 @@ contract MoonChessGame is ERC1155Holder, Ownable {
         address _user,
         uint256 _withdrawAmount,
         uint256 _burnAmount
-    ) public onlyGame {
+    ) public pausable onlyGame {
         token.transfer(_user, _withdrawAmount);
         token.burn(_burnAmount);
     }
@@ -78,7 +78,7 @@ contract MoonChessGame is ERC1155Holder, Ownable {
         uint256[] memory _amounts,
         uint256[] memory _burnIds,
         uint256[] memory _burnAmount
-    ) public onlyGame {
+    ) public pausable onlyGame {
         collection.safeBatchTransferFrom(
             address(this),
             _user,
