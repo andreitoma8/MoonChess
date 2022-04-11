@@ -91,6 +91,7 @@ contract MoonChessGame is ERC1155Holder, Ownable {
 
     // Utils
 
+    // Modifier for pausable functions
     modifier pausable() {
         require(!paused, "Deposits are paused");
         _;
@@ -101,6 +102,7 @@ contract MoonChessGame is ERC1155Holder, Ownable {
         paused = _paused;
     }
 
+    // Set the address that can send withdrawals to players
     function setGameAddress(address _newGameAddress) public onlyOwner {
         gameAddress = _newGameAddress;
     }
