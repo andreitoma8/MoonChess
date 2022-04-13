@@ -25,6 +25,7 @@ contract MoonChessCollection is
 
     uint256 public price = 5 ether;
     uint256 public maxSupply = 1000000;
+    uint256 private collectionsReleased = 4;
 
     bool private paused = false;
 
@@ -43,6 +44,7 @@ contract MoonChessCollection is
         );
         require(totalSupply(id) + amount <= maxSupply, "Max supply reached");
         token.transferFrom(msg.sender, address(this), price * amount);
+        require(id <= collectionsReleased, "TokenId nonexistent");
         _;
     }
 
@@ -63,6 +65,7 @@ contract MoonChessCollection is
                 "You can not mint more than 10 NFTs per transaction"
             );
             s += amounts[i];
+            require(ids[i] <= collectionsReleased, "TokenId nonexistent");
         }
         token.transferFrom(msg.sender, address(this), price * s);
         _;
@@ -94,6 +97,14 @@ contract MoonChessCollection is
     // Set if minting is paused or not
     function setPaused(bool _paused) public onlyOwner {
         paused = _paused;
+    }
+
+    // Set the number of diefrent cards available to mint
+    function setCollectionsReleased(uint256 _collectionsReleased)
+        public
+        onlyOwner
+    {
+        collectionsReleased = _collectionsReleased;
     }
 
     // Set the price
