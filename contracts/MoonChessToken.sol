@@ -29,7 +29,7 @@ contract MoonChessToken is
         // _mint(presale, 200000000000);
         // _mint(ecosystem, 150000000000);
         // _mint(rewards, 150000000000);
-        _mint(msg.sender, 1000000000000);
+        _mint(msg.sender, 1000000000000 * decimals());
     }
 
     function _afterTokenTransfer(
