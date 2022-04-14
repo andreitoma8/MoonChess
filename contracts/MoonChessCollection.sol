@@ -81,12 +81,12 @@ contract MoonChessCollection is
     }
 
     // Mint function in bulk where people can buy more than one type of cards
-    function mintBatch(
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts
-    ) public payable mintBatchCompliance(ids, amounts) {
-        _mintBatch(to, ids, amounts, "");
+    function mintBatch(uint256[] memory ids, uint256[] memory amounts)
+        public
+        payable
+        mintBatchCompliance(ids, amounts)
+    {
+        _mintBatch(msg.sender, ids, amounts, "");
     }
 
     // Set the URI for metadata
