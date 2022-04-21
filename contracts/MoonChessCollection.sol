@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.12;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -44,7 +44,7 @@ contract MoonChessCollection is
         );
         require(totalSupply(id) + amount <= maxSupply, "Max supply reached");
         token.transferFrom(msg.sender, address(this), price * amount);
-        require(id <= collectionsReleased, "TokenId nonexistent");
+        require(id < collectionsReleased, "TokenId nonexistent");
         _mint(msg.sender, id, amount, "");
     }
 
@@ -64,7 +64,7 @@ contract MoonChessCollection is
                 "You can not mint more than 10 NFTs per transaction"
             );
             s += amounts[i];
-            require(ids[i] <= collectionsReleased, "TokenId nonexistent");
+            require(ids[i] < collectionsReleased, "TokenId nonexistent");
         }
         token.transferFrom(msg.sender, address(this), price * s);
         _mintBatch(msg.sender, ids, amounts, "");
@@ -120,9 +120,9 @@ contract MoonChessCollection is
 
     // View function for frontend
     function frontEndTotalSupply() external view returns (uint256[] memory) {
-        uint256[] memory supplies;
-        for (uint256 i = 1; i <= collectionsReleased; ++i) {
-            supplies[i] = totalSupply(i);
+        uint256[] memory supplies = new uint256[](collectionsReleased + 1);
+        for (uint256 i = 0; i < collectionsReleased; ++i) {
+            supplies[i + 1] = totalSupply(i);
         }
         uint256 s;
         for (uint256 i = 1; i <= collectionsReleased; ++i) {
