@@ -23,7 +23,7 @@ contract MoonChessCollection is
     string private uriPrefix;
     string private uriSuffix = ".json";
 
-    uint256 public price = 5 ether;
+    uint256 public price = 10 ether;
     uint256 public maxSupply = 1000000;
     uint256 private collectionsReleased = 4;
 
@@ -113,9 +113,23 @@ contract MoonChessCollection is
                 : "";
     }
 
-    // Withdraw ETH function
+    // Withdraw MCH function
     function withdraw(uint256 _amount) public onlyOwner {
         token.transfer(owner(), _amount);
+    }
+
+    // View function for frontend
+    function frontEndTotalSupply() external view returns (uint256[] memory) {
+        uint256[] memory supplies;
+        for (uint256 i = 1; i <= collectionsReleased; ++i) {
+            supplies[i] = totalSupply(i);
+        }
+        uint256 s;
+        for (uint256 i = 1; i <= collectionsReleased; ++i) {
+            s += supplies[i];
+        }
+        supplies[0] = s;
+        return supplies;
     }
 
     // The following functions are overrides required by Solidity.
