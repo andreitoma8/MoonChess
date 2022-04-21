@@ -29,14 +29,14 @@ contract MoonChessCollection is
 
     bool private paused = false;
 
-    constructor(address _token) ERC1155("") {
+    constructor(IMoonChessToken _token) ERC1155("") {
         name = "Moon Chess";
         symbol = "CHESS";
-        token = IMoonChessToken(_token);
+        token = _token;
     }
 
-    // Mint modifier
-    modifier mintCompliance(uint256 id, uint256 amount) {
+    // Mint function where people buy
+    function mint(uint256 id, uint256 amount) external {
         require(!paused, "Minting is paused");
         require(
             amount <= 10,
@@ -45,14 +45,13 @@ contract MoonChessCollection is
         require(totalSupply(id) + amount <= maxSupply, "Max supply reached");
         token.transferFrom(msg.sender, address(this), price * amount);
         require(id <= collectionsReleased, "TokenId nonexistent");
-        _;
+        _mint(msg.sender, id, amount, "");
     }
 
-    // Batch mint modifier
-    modifier mintBatchCompliance(
-        uint256[] memory ids,
-        uint256[] memory amounts
-    ) {
+    // Mint function in bulk where people can buy more than one type of cards
+    function mintBatch(uint256[] memory ids, uint256[] memory amounts)
+        external
+    {
         require(!paused, "Minting is paused");
         uint256 s;
         for (uint256 i = 0; i < ids.length; i++) {
@@ -68,24 +67,6 @@ contract MoonChessCollection is
             require(ids[i] <= collectionsReleased, "TokenId nonexistent");
         }
         token.transferFrom(msg.sender, address(this), price * s);
-        _;
-    }
-
-    // Mint function where people buy
-    function mint(uint256 id, uint256 amount)
-        public
-        payable
-        mintCompliance(id, amount)
-    {
-        _mint(msg.sender, id, amount, "");
-    }
-
-    // Mint function in bulk where people can buy more than one type of cards
-    function mintBatch(uint256[] memory ids, uint256[] memory amounts)
-        public
-        payable
-        mintBatchCompliance(ids, amounts)
-    {
         _mintBatch(msg.sender, ids, amounts, "");
     }
 

@@ -3,10 +3,11 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "../interfaces/IMoonChessCollection.sol";
 import "../interfaces/IMoonChessToken.sol";
 
-contract MoonChessGame is ERC1155Holder, Ownable {
+contract MoonChessGame is ERC1155Holder, Ownable, ReentrancyGuard {
     IMoonChessToken public token;
     IMoonChessCollection public collection;
 
@@ -66,7 +67,7 @@ contract MoonChessGame is ERC1155Holder, Ownable {
         address _user,
         uint256 _withdrawAmount,
         uint256 _burnAmount
-    ) public pausable onlyGame {
+    ) public pausable nonReentrant onlyGame {
         token.transfer(_user, _withdrawAmount);
         token.burn(_burnAmount);
     }
@@ -78,7 +79,7 @@ contract MoonChessGame is ERC1155Holder, Ownable {
         uint256[] memory _amounts,
         uint256[] memory _burnIds,
         uint256[] memory _burnAmount
-    ) public pausable onlyGame {
+    ) public pausable nonReentrant onlyGame {
         collection.safeBatchTransferFrom(
             address(this),
             _user,
