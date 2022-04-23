@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+//Creator: andreitoma8
 pragma solidity ^0.8.12;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
@@ -27,12 +28,19 @@ contract MoonChessCollection is
     uint256 public maxSupply = 1000000;
     uint256 private collectionsReleased = 4;
 
+    uint256 teamAllocation = maxSupply / 100;
+    uint256 maxSupplyForEcosystem = maxSupply / 10;
+    uint256 supplyForEcosystemMinted;
+
     bool private paused = false;
 
     constructor(IMoonChessToken _token) ERC1155("") {
         name = "Moon Chess";
         symbol = "CHESS";
         token = _token;
+        for (uint256 i; i < 4; ++i) {
+            _mint(msg.sender, i, teamAllocation, "");
+        }
     }
 
     // Mint function where people buy

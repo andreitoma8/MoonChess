@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+// Creator: andreitoma8
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
@@ -27,12 +28,11 @@ contract MoonChessGame is ERC1155Holder, Ownable, ReentrancyGuard {
     // Set the address of the Token and the Collection
     constructor(
         address _token,
-        address _collection,
-        address _gameAddress
+        address _collection //, //address _gameAddress
     ) {
         token = IMoonChessToken(_token);
         collection = IMoonChessCollection(_collection);
-        gameAddress = _gameAddress;
+        //gameAddress = _gameAddress;
     }
 
     // Modifier for game to make payments

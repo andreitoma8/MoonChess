@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+// Creator: andreitoma8
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -29,7 +30,7 @@ contract MoonChessToken is
         // _mint(presale, 200000000000);
         // _mint(ecosystem, 150000000000);
         // _mint(rewards, 150000000000);
-        _mint(msg.sender, 1000000000000 * decimals());
+        _mint(msg.sender, 1000000000000 * 10**18);
     }
 
     function _afterTokenTransfer(
